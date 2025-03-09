@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet id="1" author="kek20703">
+
+        <createTable tableName="users">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="username" type="varchar(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="hashed_password" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="role" type="varchar(50)" defaultValue="USER">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+
+        </createTable>
+
+        <sql>COMMENT
+        ON TABLE users IS 'Таблица для хранения пользователей';</sql>
+        <sql>COMMENT
+        ON COLUMN users.id IS 'Уникальный идентификатор пользователя';</sql>
+        <sql>COMMENT
+        ON COLUMN users.username IS 'Имя пользователя';</sql>
+        <sql>COMMENT
+        ON COLUMN users.hashed_password IS 'Хешированный пароль'</sql>
+        <sql>COMMENT
+        ON COLUMN users.role IS 'Роль пользователя'
+        </sql>
+        <sql>COMMENT
+        ON COLUMN users.created_at IS 'Дата и время создания записи';</sql>
+    </changeSet>
+</databaseChangeLog>
