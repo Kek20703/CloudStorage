@@ -22,14 +22,9 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="role" type="varchar(50)" defaultValue="USER">
-                <constraints nullable="false"/>
-            </column>
-
             <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-
 
         </createTable>
 
@@ -41,9 +36,6 @@
         ON COLUMN users.username IS 'Имя пользователя';</sql>
         <sql>COMMENT
         ON COLUMN users.hashed_password IS 'Хешированный пароль'</sql>
-        <sql>COMMENT
-        ON COLUMN users.role IS 'Роль пользователя'
-        </sql>
         <sql>COMMENT
         ON COLUMN users.created_at IS 'Дата и время создания записи';</sql>
     </changeSet>
