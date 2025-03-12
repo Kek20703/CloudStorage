@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
@@ -19,8 +19,8 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
 
-        return user.map(MyUserDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException(username + "There is not such user in REPO"));
+        return user.map(CustomUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException(username + "User Not Found"));
     }
 
 }
