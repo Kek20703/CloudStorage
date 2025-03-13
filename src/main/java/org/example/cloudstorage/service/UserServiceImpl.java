@@ -1,7 +1,6 @@
 package org.example.cloudstorage.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.cloudstorage.dto.request.SignInRequestDto;
 import org.example.cloudstorage.dto.request.SignUpRequestDto;
 import org.example.cloudstorage.dto.response.SignUpResponseDto;
 import org.example.cloudstorage.entity.User;
@@ -23,7 +22,6 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<SignUpResponseDto> signUp(SignUpRequestDto signUpDto) {
         User user = new User(
                 signUpDto.username(),
-                "USER",
                 passwordEncoder.encode(signUpDto.password())
         );
         try {
@@ -35,13 +33,4 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.CREATED).body(signUpResponseDto);
     }
 
-    @Override
-    public void signOut() {
-
-    }
-
-    @Override
-    public ResponseEntity<String> signIn(SignInRequestDto signInDto) {
-        return null;
-    }
 }
