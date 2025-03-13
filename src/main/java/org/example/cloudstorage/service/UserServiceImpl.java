@@ -17,17 +17,17 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public SignUpResponseDto signUp(SignUpRequestDto signUpDto) {
+    public SignUpResponseDto signUp(SignUpRequestDto signUpRequestDto) {
         User user = new User(
-                signUpDto.username(),
-                passwordEncoder.encode(signUpDto.password())
+                signUpRequestDto.username(),
+                passwordEncoder.encode(signUpRequestDto.password())
         );
         try {
             userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new UsernameIsAlreadyTakenException("Username is already taken");
         }
-        SignUpResponseDto signUpResponseDto = new SignUpResponseDto(signUpDto.username());
+        SignUpResponseDto signUpResponseDto = new SignUpResponseDto(signUpRequestDto.username());
         return signUpResponseDto;
     }
 
