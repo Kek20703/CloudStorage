@@ -1,4 +1,6 @@
 package org.example.cloudstorage.dto.response;
 
-public record ErrorResponseDto(String message) {
+public record ErrorResponseDto(
+        String message
+) {
 }

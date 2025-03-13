@@ -27,8 +27,8 @@ public class UserServiceImpl implements UserService {
         } catch (DataIntegrityViolationException e) {
             throw new UsernameIsAlreadyTakenException("Username is already taken");
         }
-        SignUpResponseDto signUpResponseDto = new SignUpResponseDto(signUpRequestDto.username());
-        return signUpResponseDto;
+        return new SignUpResponseDto(signUpRequestDto.username());
+
     }
 
 }

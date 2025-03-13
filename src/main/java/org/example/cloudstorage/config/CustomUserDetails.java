@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.cloudstorage.entity.User;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private final String username;
