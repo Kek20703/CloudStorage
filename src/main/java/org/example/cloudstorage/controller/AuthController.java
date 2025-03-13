@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.cloudstorage.dto.request.SignInRequestDto;
 import org.example.cloudstorage.dto.request.SignUpRequestDto;
 import org.example.cloudstorage.dto.response.SignInResponseDto;
-import org.example.cloudstorage.dto.response.SignUpResponseDto;
 import org.example.cloudstorage.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +31,7 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @PostMapping("/sign-up")
     public ResponseEntity<?> register(@Validated @RequestBody SignUpRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.signUp(requestDto));
@@ -43,9 +42,9 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.username(), requestDto.password())
         );
-        SecurityContext context =  SecurityContextHolder.getContext();
+        SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(authentication);
-        securityContextRepository.saveContext(context,request, response);
+        securityContextRepository.saveContext(context, request, response);
         return ResponseEntity.status(HttpStatus.OK).body(new SignInResponseDto(requestDto.username()));
     }
 }
