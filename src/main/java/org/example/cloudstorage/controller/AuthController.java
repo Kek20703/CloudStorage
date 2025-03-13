@@ -7,7 +7,6 @@ import org.example.cloudstorage.dto.request.SignInRequestDto;
 import org.example.cloudstorage.dto.request.SignUpRequestDto;
 import org.example.cloudstorage.dto.response.SignInResponseDto;
 import org.example.cloudstorage.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,9 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final UserService userService;
     private final SecurityContextRepository securityContextRepository;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> register(@Validated @RequestBody SignUpRequestDto requestDto) {
@@ -38,13 +35,13 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<?> signIn(@Validated @RequestBody SignInRequestDto requestDto, HttpServletRequest request, HttpServletResponse response) {
+    public SignInResponseDto signIn(@Validated @RequestBody SignInRequestDto requestDto, HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.username(), requestDto.password())
         );
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(authentication);
         securityContextRepository.saveContext(context, request, response);
-        return ResponseEntity.status(HttpStatus.OK).body(new SignInResponseDto(requestDto.username()));
+        return new SignInResponseDto(requestDto.username());
     }
 }
