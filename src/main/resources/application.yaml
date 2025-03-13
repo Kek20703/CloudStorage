@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: CloudStorage
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    driver-class-name: ${DB_DRIVER}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    default-schema: public
+    change-log: classpath:/db/changelog/main-changelog.xml
+
+logging:
+  level:
+    org:
+      springframework:
+        security: trace
+
+server:
+  servlet:
+    session:
+      cookie:
+        max-age: 30m
+        name: SESSION
+        http-only: true
+        secure: true
+        path: /
