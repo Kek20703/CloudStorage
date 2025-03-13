@@ -38,7 +38,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
-                .securityContext((securityContext) -> securityContext.securityContextRepository(securityContextRepository()))
+                .securityContext((securityContext)
+                        -> securityContext.securityContextRepository(securityContextRepository()))
                 .sessionManagement(
                         sessionManagement -> sessionManagement
                                 .maximumSessions(1)
@@ -65,7 +66,8 @@ public class SecurityConfig {
 
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
-        return (request, response, authentication) -> response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        return (request, response,
+                authentication) -> response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Bean

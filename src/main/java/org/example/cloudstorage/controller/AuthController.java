@@ -35,7 +35,8 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public SignInResponseDto signIn(@Validated @RequestBody SignInRequestDto requestDto, HttpServletRequest request, HttpServletResponse response) {
+    public SignInResponseDto signIn(@Validated @RequestBody SignInRequestDto requestDto,
+                                    HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.username(), requestDto.password())
         );

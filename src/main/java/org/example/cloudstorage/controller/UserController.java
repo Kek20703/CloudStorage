@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class UserController {
     @GetMapping()
-    public ResponseEntity<SignUpResponseDto> home(@AuthenticationPrincipal UserDetails userDetails, @CookieValue(value = "JSESSIONID", required = false) String sessionid) {
+    public ResponseEntity<SignUpResponseDto> home(@AuthenticationPrincipal UserDetails userDetails) {
 
         return ResponseEntity.ok(new SignUpResponseDto(userDetails.getUsername()));
     }
