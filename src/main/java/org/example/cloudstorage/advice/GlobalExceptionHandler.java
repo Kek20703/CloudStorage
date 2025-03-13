@@ -1,5 +1,6 @@
 package org.example.cloudstorage.advice;
 
+import org.example.cloudstorage.dto.response.ErrorResponseDto;
 import org.example.cloudstorage.exception.UsernameIsAlreadyTakenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameIsAlreadyTakenException.class)
-    public ResponseEntity<Void> usernameIsAlreadyTaken(UsernameIsAlreadyTakenException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    public ResponseEntity<ErrorResponseDto> usernameIsAlreadyTaken(UsernameIsAlreadyTakenException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto("Username is not available"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
