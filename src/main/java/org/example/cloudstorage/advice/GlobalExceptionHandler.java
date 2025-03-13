@@ -16,8 +16,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameIsAlreadyTakenException.class)
-    public ResponseEntity<String> usernameIsAlreadyTaken(UsernameIsAlreadyTakenException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    public ResponseEntity<Void> usernameIsAlreadyTaken(UsernameIsAlreadyTakenException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
