@@ -29,3 +29,6 @@ server:
         http-only: true
         secure: true
         path: /
+  data:
+    redis:
+      port: ${SPRING_REDIS_PORT}
