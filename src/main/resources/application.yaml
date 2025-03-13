@@ -12,7 +12,7 @@ spring:
       ddl-auto: validate
   liquibase:
     default-schema: public
-    change-log: classpath:/db/changelog/main-changelog.xml
+    change-log: classpath:/db/changelog/main-changelog.json
 
 logging:
   level:
