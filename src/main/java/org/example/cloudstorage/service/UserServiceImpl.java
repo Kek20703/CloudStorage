@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public ResponseEntity<SignUpResponseDto> signUp(SignUpRequestDto signUpDto) {
+    public SignUpResponseDto signUp(SignUpRequestDto signUpDto) {
         User user = new User(
                 signUpDto.username(),
                 passwordEncoder.encode(signUpDto.password())
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
             throw new UsernameIsAlreadyTakenException("Username is already taken");
         }
         SignUpResponseDto signUpResponseDto = new SignUpResponseDto(signUpDto.username());
-        return ResponseEntity.status(HttpStatus.CREATED).body(signUpResponseDto);
+        return signUpResponseDto;
     }
 
 }

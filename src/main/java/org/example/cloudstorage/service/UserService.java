@@ -6,6 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
-    ResponseEntity<SignUpResponseDto> signUp(SignUpRequestDto signUpDto);
+    SignUpResponseDto signUp(SignUpRequestDto signUpDto);
 
 }

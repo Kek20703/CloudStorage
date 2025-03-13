@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.cloudstorage.dto.request.SignInRequestDto;
 import org.example.cloudstorage.dto.request.SignUpRequestDto;
 import org.example.cloudstorage.dto.response.SignInResponseDto;
+import org.example.cloudstorage.dto.response.SignUpResponseDto;
 import org.example.cloudstorage.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     @PostMapping("/sign-up")
     public ResponseEntity<?> register(@Validated @RequestBody SignUpRequestDto requestDto) {
-        return userService.signUp(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.signUp(requestDto));
     }
 
     @PostMapping("/sign-in")
