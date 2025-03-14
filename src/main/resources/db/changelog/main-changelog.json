@@ -1,0 +1,10 @@
+{
+  "databaseChangeLog": [
+    {
+      "includeAll": {
+        "path": "/changes/v1.0",
+        "relativeToChangelogFile": true
+      }
+    }
+  ]
+}
