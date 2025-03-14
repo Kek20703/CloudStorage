@@ -32,3 +32,12 @@ server:
   data:
     redis:
       port: ${SPRING_REDIS_PORT}
+
+cloudstorage:
+  storage:
+    minio:
+      enabled: false
+      endpoint: ${MINIO_ENDPOINT}
+      user: ${MINIO_ROOT_USER}
+      password: ${MINIO_ROOT_PASSWORD}
+      bucket: ${MINIO_BUCKET}
