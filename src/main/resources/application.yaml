@@ -36,7 +36,7 @@ server:
 cloudstorage:
   storage:
     minio:
-      enabled: false
+      enabled: true
       endpoint: ${MINIO_ENDPOINT}
       user: ${MINIO_ROOT_USER}
       password: ${MINIO_ROOT_PASSWORD}
