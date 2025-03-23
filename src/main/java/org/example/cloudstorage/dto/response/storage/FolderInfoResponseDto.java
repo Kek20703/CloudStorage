@@ -1,10 +1,12 @@
 package org.example.cloudstorage.dto.response.storage;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@RequiredArgsConstructor
-public class FolderInfoResponseDto implements ResourceInfoResponseDto{
-    private final String path;
-    private final String name;
-    private final String type;
+@Data
+@AllArgsConstructor
+public class FolderInfoResponseDto implements ResourceInfoResponseDto {
+    private String path;
+    private String name;
+    private String type;
 }
