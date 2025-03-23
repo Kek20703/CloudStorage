@@ -1,4 +1,4 @@
-package org.example.cloudstorage.service;
+package org.example.cloudstorage.repository;
 
 import org.example.cloudstorage.dto.response.ResourceInfoResponseDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.util.List;
 
-public interface StorageService {
+public interface FileStorageRepository {
 
     void createDefaultUserDirectory(Long userId);
 
