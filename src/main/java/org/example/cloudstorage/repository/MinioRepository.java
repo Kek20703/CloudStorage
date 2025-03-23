@@ -61,10 +61,11 @@ public class MinioRepository implements FileStorageRepository {
 
     @SneakyThrows
     @Override
-    public void save(Long userId, String filename, MultipartFile file) {
+    public ResourceInfoResponseDto save(Long userId, String filename, MultipartFile file) {
         String path = formatPath(userId, filename);
         InputStream inputStream = file.getInputStream();
         uploadFile(path, inputStream);
+        return getInfo(userId, filename);
     }
 
     @Override
