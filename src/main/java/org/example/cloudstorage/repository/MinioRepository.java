@@ -119,7 +119,7 @@ public class MinioRepository implements FileStorageRepository {
 
             try {
                 Item item = resultItem.get();
-                String responsePath = item.objectName();
+                String responsePath = removeUserPrefix(item.objectName());
                 long responseSize = item.size();
                 ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath, responseSize);
                 resultList.add(responseDto);
@@ -148,7 +148,7 @@ public class MinioRepository implements FileStorageRepository {
         for (Result<Item> item : contentList) {
             try {
                 Item resource = item.get();
-                String responsePath = resource.objectName();
+                String responsePath = removeUserPrefix(resource.objectName());
                 long responseSize = resource.size();
                 resultList.add(
                         createResourceInfoResponseDto(responsePath, responseSize)
@@ -356,5 +356,10 @@ public class MinioRepository implements FileStorageRepository {
     private String formatPath(Long userId, String fileName) {
         String userPrefix = formatUserPrefix(userId);
         return userPrefix + fileName;
+    }
+
+    private String removeUserPrefix(String path) {
+        int prefixEndIndex = path.indexOf("/");
+        return path.substring(prefixEndIndex+1);
     }
 }
