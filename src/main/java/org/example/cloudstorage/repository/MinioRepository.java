@@ -45,8 +45,8 @@ import java.util.zip.ZipOutputStream;
 public class MinioRepository implements FileStorageRepository {
 
     private static final String USER_PREFIX_FORMAT = "user-${%d}-files/";
-    private static final String RESPONSE_TYPE_FOLDER = "folder";
-    private static final String RESPONSE_TYPE_FILE = "file";
+    private static final String RESPONSE_TYPE_FOLDER = "FOLDER";
+    private static final String RESPONSE_TYPE_FILE = "FILE";
     private static final boolean RECURSIVE = true;
     private static final boolean NON_RECURSIVE = false;
 
