@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.example.cloudstorage.config.MinioProperties;
-import org.example.cloudstorage.dto.response.ResourceInfoResponseDto;
+import org.example.cloudstorage.dto.response.storage.FileInfoResponseDto;
+import org.example.cloudstorage.dto.response.storage.FolderInfoResponseDto;
+import org.example.cloudstorage.dto.response.storage.ResourceInfoResponseDto;
 import org.example.cloudstorage.exception.ResourceNotFoundException;
 import org.example.cloudstorage.exception.StorageException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -88,7 +90,7 @@ public class MinioRepository implements FileStorageRepository {
     public ResourceInfoResponseDto getInfo(Long userId, String path) {
         String fullPath = formatPath(userId, path);
         StatObjectResponse stat = getStat(fullPath);
-        return createResourceInfoResponseDto(path, String.valueOf(stat.size()));
+        return createResourceInfoResponseDto(path, stat.size());
     }
 
     @Override
@@ -118,7 +120,7 @@ public class MinioRepository implements FileStorageRepository {
             try {
                 Item item = resultItem.get();
                 String responsePath = item.objectName();
-                String responseSize = String.valueOf(item.size());
+                long responseSize = item.size();
                 ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath, responseSize);
                 resultList.add(responseDto);
             } catch (Exception e) {
@@ -147,7 +149,7 @@ public class MinioRepository implements FileStorageRepository {
             try {
                 Item resource = item.get();
                 String responsePath = resource.objectName();
-                String responseSize = String.valueOf(resource.size());
+                long responseSize = resource.size();
                 resultList.add(
                         createResourceInfoResponseDto(responsePath, responseSize)
                 );
@@ -325,12 +327,12 @@ public class MinioRepository implements FileStorageRepository {
         }
     }
 
-    private ResourceInfoResponseDto createResourceInfoResponseDto(String path, String responseSize) {
+    private ResourceInfoResponseDto createResourceInfoResponseDto(String path, long responseSize) {
         String responsePath = extractPath(path);
         String responseName = extractName(path);
         return isDirectory(path)
-                ? new ResourceInfoResponseDto(responsePath, responseName, RESPONSE_TYPE_FOLDER)
-                : new ResourceInfoResponseDto(responsePath, responseName, responseSize, RESPONSE_TYPE_FILE);
+                ? new FolderInfoResponseDto(responsePath+"/", responseName, RESPONSE_TYPE_FOLDER)
+                : new FileInfoResponseDto(responsePath, responseName, responseSize, RESPONSE_TYPE_FILE);
     }
 
     private boolean isDirectory(String path) {
