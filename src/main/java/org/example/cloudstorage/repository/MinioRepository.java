@@ -333,7 +333,7 @@ public class MinioRepository implements FileStorageRepository {
         String responseName = extractName(path);
         return isDirectory(path)
                 ? new FolderInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY)
-                : new FileInfoResponseDto(responsePath, responseName, responseSize, RESPONSE_TYPE_FILE);
+                : new FileInfoResponseDto("/"+responsePath+"/", responseName, responseSize, RESPONSE_TYPE_FILE);
     }
 
     private boolean isDirectory(String path) {
