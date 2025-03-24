@@ -332,7 +332,7 @@ public class MinioRepository implements FileStorageRepository {
         String responsePath = extractPath(path);
         String responseName = extractName(path);
         return isDirectory(path)
-                ? new FolderInfoResponseDto(responsePath+"/", responseName, RESPONSE_TYPE_DIRECTORY)
+                ? new FolderInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY)
                 : new FileInfoResponseDto(responsePath, responseName, responseSize, RESPONSE_TYPE_FILE);
     }
 
@@ -361,6 +361,6 @@ public class MinioRepository implements FileStorageRepository {
 
     private String removeUserPrefix(String path) {
         int prefixEndIndex = path.indexOf("/");
-        return path.substring(prefixEndIndex+1);
+        return path.substring(prefixEndIndex + 1);
     }
 }
