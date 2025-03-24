@@ -149,7 +149,11 @@ public class MinioRepository implements FileStorageRepository {
         for (Result<Item> item : contentList) {
             try {
                 Item resource = item.get();
-                String responsePath = removeUserPrefix(resource.objectName());
+                String objectName = resource.objectName();
+                if (objectName.equals(fullPath)) {
+                    continue;
+                }
+                String responsePath = removeUserPrefix(objectName);
                 long responseSize = resource.size();
                 resultList.add(
                         createResourceInfoResponseDto(responsePath, responseSize)
@@ -333,7 +337,7 @@ public class MinioRepository implements FileStorageRepository {
         String responseName = extractName(path);
         return isDirectory(path)
                 ? new FolderInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY)
-                : new FileInfoResponseDto("/"+responsePath+"/", responseName, responseSize, RESPONSE_TYPE_FILE);
+                : new FileInfoResponseDto("/" + responsePath + "/", responseName, responseSize, RESPONSE_TYPE_FILE);
     }
 
     private boolean isDirectory(String path) {
