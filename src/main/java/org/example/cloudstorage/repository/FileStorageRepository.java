@@ -10,7 +10,7 @@ public interface FileStorageRepository {
 
     void createDefaultUserDirectory(Long userId);
 
-    ResourceInfoResponseDto save(Long userId, String path, MultipartFile file);
+    ResourceInfoResponseDto save(Long userId, String path,  List<MultipartFile>  files);
 
     void delete(Long userId, String path);
 

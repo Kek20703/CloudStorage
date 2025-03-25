@@ -8,12 +8,13 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.Result;
+import io.minio.SnowballObject;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
+import io.minio.UploadSnowballObjectsArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.example.cloudstorage.config.MinioProperties;
 import org.example.cloudstorage.dto.response.storage.FileInfoResponseDto;
@@ -33,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -59,12 +61,22 @@ public class MinioRepository implements FileStorageRepository {
         createEmptyFolder(path);
     }
 
-    @SneakyThrows
     @Override
-    public ResourceInfoResponseDto save(Long userId, String filename, MultipartFile file) {
-        String path = formatPath(userId, filename);
-        InputStream inputStream = file.getInputStream();
-        uploadFile(path, inputStream);
+    public ResourceInfoResponseDto save(Long userId, String filename, List<MultipartFile> files) {
+        String fullPath = formatPath(userId, filename);
+        List<SnowballObject> objects = new ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                objects.add(new SnowballObject(
+                        fullPath + file.getOriginalFilename(),
+                        file.getInputStream(),
+                        file.getSize(),
+                        ZonedDateTime.now()));
+            }
+        } catch (Exception e) {
+            throw new StorageException(e.getMessage());
+        }
+        uploadSnowballObjects(objects);
         return getInfo(userId, filename);
     }
 
@@ -165,14 +177,15 @@ public class MinioRepository implements FileStorageRepository {
         return resultList;
     }
 
-    @SneakyThrows
-    private void uploadFile(String objectName, InputStream inputStream) {
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(minioProperties.getBucket())
-                        .object(objectName)
-                        .stream(inputStream, inputStream.available(), -1)
-                        .build());
+    private void uploadSnowballObjects(List<SnowballObject> objects) {
+        try {
+            minioClient.uploadSnowballObjects(UploadSnowballObjectsArgs.builder()
+                    .bucket(minioProperties.getBucket())
+                    .objects(objects)
+                    .build());
+        } catch (Exception e) {
+            throw new StorageException(e.getMessage());
+        }
     }
 
     private InputStream getFile(String objectName) {
@@ -351,7 +364,7 @@ public class MinioRepository implements FileStorageRepository {
 
     private String extractPath(String path) {
         Path pathObj = Paths.get(path);
-        return pathObj.getParent() != null ? "/"+pathObj.getParent().toString()+"/" : "";
+        return pathObj.getParent() != null ? "/" + pathObj.getParent().toString() + "/" : "";
 
     }
 
