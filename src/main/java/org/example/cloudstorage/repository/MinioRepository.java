@@ -85,7 +85,6 @@ public class MinioRepository implements FileStorageRepository {
         String fullPath = formatPath(userId, filename);
         if (isDirectory(fullPath)) {
             deleteDirectory(fullPath);
-            return;
         }
         removeObject(fullPath);
     }
