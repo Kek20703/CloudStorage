@@ -131,16 +131,17 @@ public class MinioRepository implements FileStorageRepository {
 
             try {
                 Item item = resultItem.get();
-                String responsePath = removeUserPrefix(item.objectName());
-                long responseSize = item.size();
-                ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath, responseSize);
-                resultList.add(responseDto);
+                String objectName = extractName(item.objectName());
+                if (objectName.toLowerCase().contains(path.toLowerCase())) {
+                    String responsePath = removeUserPrefix(item.objectName());
+                    long responseSize = item.size();
+                    ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath, responseSize);
+                    resultList.add(responseDto);
+                }
             } catch (Exception e) {
                 throw new StorageException(e.getMessage());
             }
-
         }
-
         return resultList;
     }
 
