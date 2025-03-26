@@ -333,9 +333,6 @@ public class MinioRepository implements FileStorageRepository {
             try {
                 Item resource = item.get();
                 String objectName = resource.objectName();
-                if (isDirectory(objectName)) {
-                    continue;
-                }
                 removeObject(objectName);
             } catch (Exception e) {
                 throw new StorageException(e.getMessage());
@@ -363,7 +360,7 @@ public class MinioRepository implements FileStorageRepository {
 
     private String extractPath(String path) {
         Path pathObj = Paths.get(path);
-        return pathObj.getParent() != null ? "/" + pathObj.getParent().toString() + "/" : "";
+        return pathObj.getParent() != null ? pathObj.getParent().toString() + "/" : "";
 
     }
 
