@@ -20,6 +20,7 @@ import org.example.cloudstorage.config.MinioProperties;
 import org.example.cloudstorage.dto.response.storage.FileInfoResponseDto;
 import org.example.cloudstorage.dto.response.storage.FolderInfoResponseDto;
 import org.example.cloudstorage.dto.response.storage.ResourceInfoResponseDto;
+import org.example.cloudstorage.exception.ResourceAlreadyExistsException;
 import org.example.cloudstorage.exception.ResourceNotFoundException;
 import org.example.cloudstorage.exception.StorageException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -65,6 +66,9 @@ public class MinioRepository implements FileStorageRepository {
     @Override
     public ResourceInfoResponseDto save(Long userId, String filename, List<MultipartFile> files) {
         String fullPath = formatPath(userId, filename);
+        if (checkIfObjectExists(fullPath)) {
+            throw new ResourceAlreadyExistsException("Object already exists");
+        }
         List<SnowballObject> objects = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
@@ -113,6 +117,9 @@ public class MinioRepository implements FileStorageRepository {
     @Override
     public ResourceInfoResponseDto rename(Long userId, String oldPath, String newPath) {
         String oldFullPath = formatPath(userId, oldPath);
+        if (!checkIfObjectExists(oldFullPath)) {
+            throw new ResourceNotFoundException("Object does not exists");
+        }
         String newFullPath = formatPath(userId, newPath);
 
         if (isDirectory(oldFullPath)) {
@@ -159,6 +166,9 @@ public class MinioRepository implements FileStorageRepository {
     public List<ResourceInfoResponseDto> getDirectoryContentInfo(Long userId, String path) {
         List<ResourceInfoResponseDto> resultList = new ArrayList<>();
         String fullPath = formatPath(userId, path);
+        if (!checkIfObjectExists(fullPath)) {
+            throw new ResourceNotFoundException("Object does not exists");
+        }
         Iterable<Result<Item>> contentList = getListFiles(fullPath, NON_RECURSIVE);
 
         for (Result<Item> item : contentList) {
@@ -178,6 +188,14 @@ public class MinioRepository implements FileStorageRepository {
             }
         }
         return resultList;
+    }
+
+    private boolean checkIfObjectExists(String path) {
+        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder()
+                .bucket(minioProperties.getBucket())
+                .prefix(path)
+                .build());
+        return results.iterator().hasNext();
     }
 
     private void uploadSnowballObjects(List<SnowballObject> objects) {
@@ -203,6 +221,33 @@ public class MinioRepository implements FileStorageRepository {
         } catch (Exception e) {
             throw new StorageException(e.getMessage());
         }
+    }
+
+    private Resource getDirectory(String directoryPath) throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
+        Iterable<Result<Item>> objects = getListFiles(directoryPath, RECURSIVE);
+        for (Result<Item> item : objects) {
+            String objectName = item.get().objectName();
+
+            if (objectName.equals(directoryPath) || isDirectory(objectName))
+                continue;
+
+            try (InputStream inputStream = getFile(objectName)) {
+                String relativePath = objectName.substring(directoryPath.length());
+                ZipEntry zipEntry = new ZipEntry(relativePath);
+                zipOutputStream.putNextEntry(zipEntry);
+
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    zipOutputStream.write(buffer, 0, length);
+                }
+                zipOutputStream.closeEntry();
+            }
+        }
+        zipOutputStream.finish();
+        return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
 
     private void copyObject(String objectName, String newObjectName) throws RuntimeException {
@@ -269,33 +314,6 @@ public class MinioRepository implements FileStorageRepository {
         } catch (Exception e) {
             throw new StorageException(e.getMessage());
         }
-    }
-
-    private Resource getDirectory(String directoryPath) throws Exception {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
-        Iterable<Result<Item>> objects = getListFiles(directoryPath, RECURSIVE);
-        for (Result<Item> item : objects) {
-            String objectName = item.get().objectName();
-
-            if (objectName.equals(directoryPath) || isDirectory(objectName))
-                continue;
-
-            try (InputStream inputStream = getFile(objectName)) {
-                String relativePath = objectName.substring(directoryPath.length());
-                ZipEntry zipEntry = new ZipEntry(relativePath);
-                zipOutputStream.putNextEntry(zipEntry);
-
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = inputStream.read(buffer)) > 0) {
-                    zipOutputStream.write(buffer, 0, length);
-                }
-                zipOutputStream.closeEntry();
-            }
-        }
-        zipOutputStream.finish();
-        return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
 
     private void copyDirectory(String oldPath, String newPath) {
