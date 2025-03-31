@@ -64,12 +64,12 @@ public class MinioRepository implements FileStorageRepository {
     }
 
     @Override
-    public ResourceInfoResponseDto save(Long userId, String filename, List<MultipartFile> files) {
+    public List<ResourceInfoResponseDto> save(Long userId, String filename, List<MultipartFile> files) {
         String fullPath = formatPath(userId, filename);
         List<SnowballObject> objects = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
-                if (checkIfObjectExists(fullPath+file.getOriginalFilename())) {
+                if (checkIfObjectExists(fullPath + file.getOriginalFilename())) {
                     throw new ResourceAlreadyExistsException("Object already exists");
                 }
                 objects.add(new SnowballObject(
@@ -82,7 +82,14 @@ public class MinioRepository implements FileStorageRepository {
             throw new StorageException(e.getMessage());
         }
         uploadSnowballObjects(objects);
-        return getInfo(userId, filename);
+        List<ResourceInfoResponseDto> response = new ArrayList<>();
+        for (SnowballObject object : objects) {
+            String objectName = object.name();
+            StatObjectResponse stat = getStat(objectName);
+            ResourceInfoResponseDto dto = createResourceInfoResponseDto(removeUserPrefix(objectName), stat.size());
+            response.add(dto);
+        }
+        return response;
     }
 
     @Override
