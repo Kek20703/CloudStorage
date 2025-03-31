@@ -67,20 +67,22 @@ public class MinioRepository implements FileStorageRepository {
     public List<ResourceInfoResponseDto> save(Long userId, String filename, List<MultipartFile> files) {
         String fullPath = formatPath(userId, filename);
         List<SnowballObject> objects = new ArrayList<>();
-        try {
-            for (MultipartFile file : files) {
-                if (checkIfObjectExists(fullPath + file.getOriginalFilename())) {
-                    throw new ResourceAlreadyExistsException("Object already exists");
-                }
+
+        for (MultipartFile file : files) {
+            if (checkIfObjectExists(fullPath + file.getOriginalFilename())) {
+                throw new ResourceAlreadyExistsException("Object already exists");
+            }
+            try {
                 objects.add(new SnowballObject(
                         fullPath + file.getOriginalFilename(),
                         file.getInputStream(),
                         file.getSize(),
                         ZonedDateTime.now()));
+            } catch (Exception e) {
+                throw new StorageException(e.getMessage());
             }
-        } catch (Exception e) {
-            throw new StorageException(e.getMessage());
         }
+
         uploadSnowballObjects(objects);
         List<ResourceInfoResponseDto> response = new ArrayList<>();
         for (SnowballObject object : objects) {
