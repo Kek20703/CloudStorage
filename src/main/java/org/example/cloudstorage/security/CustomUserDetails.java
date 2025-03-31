@@ -13,10 +13,16 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private final String username;
     private String password;
+    private final Long id;
 
     public CustomUserDetails(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
+        this.id = user.getId();
+    }
+
+    public Long getUserId() {
+        return id;
     }
 
     @Override
