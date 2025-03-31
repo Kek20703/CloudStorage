@@ -101,7 +101,7 @@ public class MinioRepository implements FileStorageRepository {
         if (isDirectory(fullPath)) {
             try {
                 return getDirectory(fullPath);
-            } catch (ResourceNotFoundException e){
+            } catch (ResourceNotFoundException e) {
                 throw new ResourceNotFoundException(e.getMessage());
             } catch (Exception e) {
                 throw new StorageException(e.getMessage());
@@ -124,14 +124,15 @@ public class MinioRepository implements FileStorageRepository {
             throw new ResourceNotFoundException("Object does not exists");
         }
         String newFullPath = formatPath(userId, newPath);
-
         if (isDirectory(oldFullPath)) {
             copyDirectory(oldFullPath, newFullPath);
             deleteDirectory(oldFullPath);
         } else {
+            if(checkIfObjectExists(newFullPath)) {
+                throw new ResourceAlreadyExistsException("Object already exists");
+            }
             copyObject(oldFullPath, newFullPath);
         }
-
         removeObject(oldFullPath);
         return getInfo(userId, newPath);
     }
@@ -230,7 +231,7 @@ public class MinioRepository implements FileStorageRepository {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
         Iterable<Result<Item>> objects = getListFiles(directoryPath, RECURSIVE);
-        if(!objects.iterator().hasNext()) {
+        if (!objects.iterator().hasNext()) {
             throw new ResourceNotFoundException("Object does not exists");
         }
         for (Result<Item> item : objects) {
@@ -335,23 +336,24 @@ public class MinioRepository implements FileStorageRepository {
 
     private void copyDirectory(String oldPath, String newPath) {
         Iterable<Result<Item>> objects = getListFiles(oldPath, NON_RECURSIVE);
-
+        Item resource;
         for (Result<Item> item : objects) {
             try {
-                Item resource = item.get();
-                String oldObjectPath = resource.objectName();
-                String oldObjectName = extractName(oldObjectPath);
-                String newObjectFullPath = newPath + "/" + oldObjectName;
-                if (isDirectory(oldObjectPath)) {
-                    copyDirectory(oldObjectPath, newObjectFullPath);
-                    continue;
-                }
-                copyObject(oldObjectPath, newObjectFullPath);
-
-
+                resource = item.get();
             } catch (Exception e) {
                 throw new StorageException(e.getMessage());
             }
+            String oldObjectPath = resource.objectName();
+            String oldObjectName = extractName(oldObjectPath);
+            String newObjectFullPath = newPath + "/" + oldObjectName;
+            if (checkIfObjectExists(newObjectFullPath)) {
+                throw new ResourceAlreadyExistsException("Resource already exists");
+            }
+            if (isDirectory(oldObjectPath)) {
+                copyDirectory(oldObjectPath, newObjectFullPath);
+                continue;
+            }
+            copyObject(oldObjectPath, newObjectFullPath);
 
         }
     }
