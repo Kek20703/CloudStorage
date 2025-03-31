@@ -82,16 +82,8 @@ public class MinioRepository implements FileStorageRepository {
                 throw new StorageException(e.getMessage());
             }
         }
-
         uploadSnowballObjects(objects);
-        List<ResourceInfoResponseDto> response = new ArrayList<>();
-        for (SnowballObject object : objects) {
-            String objectName = object.name();
-            StatObjectResponse stat = getStat(objectName);
-            ResourceInfoResponseDto dto = createResourceInfoResponseDto(removeUserPrefix(objectName), stat.size());
-            response.add(dto);
-        }
-        return response;
+        return getInfoForSnowballObjects(objects);
     }
 
     @Override
@@ -309,6 +301,17 @@ public class MinioRepository implements FileStorageRepository {
         } catch (Exception e) {
             throw new StorageException(e.getMessage());
         }
+    }
+
+    private List<ResourceInfoResponseDto> getInfoForSnowballObjects(List<SnowballObject> objects) {
+        List<ResourceInfoResponseDto> response = new ArrayList<>();
+        for (SnowballObject object : objects) {
+            String objectName = object.name();
+            StatObjectResponse stat = getStat(objectName);
+            ResourceInfoResponseDto dto = createResourceInfoResponseDto(removeUserPrefix(objectName), stat.size());
+            response.add(dto);
+        }
+        return response;
     }
 
     private void removeObject(String objectName) {
