@@ -101,6 +101,8 @@ public class MinioRepository implements FileStorageRepository {
         if (isDirectory(fullPath)) {
             try {
                 return getDirectory(fullPath);
+            } catch (ResourceNotFoundException e){
+                throw new ResourceNotFoundException(e.getMessage());
             } catch (Exception e) {
                 throw new StorageException(e.getMessage());
             }
@@ -228,6 +230,9 @@ public class MinioRepository implements FileStorageRepository {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
         Iterable<Result<Item>> objects = getListFiles(directoryPath, RECURSIVE);
+        if(!objects.iterator().hasNext()) {
+            throw new ResourceNotFoundException("Object does not exists");
+        }
         for (Result<Item> item : objects) {
             String objectName = item.get().objectName();
 
