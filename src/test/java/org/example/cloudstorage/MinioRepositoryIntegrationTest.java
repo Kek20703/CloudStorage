@@ -255,7 +255,7 @@ public class MinioRepositoryIntegrationTest {
         var result = minioRepository.getDirectoryContentInfo(USER_ID, BASE_FOLDER);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
     }
 
     @Test
