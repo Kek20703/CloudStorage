@@ -15,6 +15,7 @@ import io.minio.UploadSnowballObjectsArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.example.cloudstorage.config.MinioProperties;
 import org.example.cloudstorage.dto.response.storage.FileInfoResponseDto;
@@ -118,6 +119,7 @@ public class MinioRepository implements FileStorageRepository {
     }
 
     @Override
+    @SneakyThrows
     public ResourceInfoResponseDto rename(Long userId, String oldPath, String newPath) {
         String oldFullPath = formatPath(userId, oldPath);
         if (!checkIfObjectExists(oldFullPath)) {
@@ -128,9 +130,6 @@ public class MinioRepository implements FileStorageRepository {
             copyDirectory(oldFullPath, newFullPath);
             deleteDirectory(oldFullPath);
         } else {
-            if(checkIfObjectExists(newFullPath)) {
-                throw new ResourceAlreadyExistsException("Object already exists");
-            }
             copyObject(oldFullPath, newFullPath);
         }
         removeObject(oldFullPath);
@@ -335,7 +334,7 @@ public class MinioRepository implements FileStorageRepository {
     }
 
     private void copyDirectory(String oldPath, String newPath) {
-        Iterable<Result<Item>> objects = getListFiles(oldPath, NON_RECURSIVE);
+        Iterable<Result<Item>> objects = getListFiles(oldPath, RECURSIVE);
         Item resource;
         for (Result<Item> item : objects) {
             try {
@@ -344,16 +343,11 @@ public class MinioRepository implements FileStorageRepository {
                 throw new StorageException(e.getMessage());
             }
             String oldObjectPath = resource.objectName();
-            String oldObjectName = extractName(oldObjectPath);
-            String newObjectFullPath = newPath + "/" + oldObjectName;
-            if (checkIfObjectExists(newObjectFullPath)) {
+            String newObjectPath = newPath + oldObjectPath.substring(oldPath.length());
+            if (checkIfObjectExists(newObjectPath)) {
                 throw new ResourceAlreadyExistsException("Resource already exists");
             }
-            if (isDirectory(oldObjectPath)) {
-                copyDirectory(oldObjectPath, newObjectFullPath);
-                continue;
-            }
-            copyObject(oldObjectPath, newObjectFullPath);
+            copyObject(oldObjectPath, newObjectPath);
 
         }
     }
