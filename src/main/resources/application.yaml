@@ -10,9 +10,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
   liquibase:
     default-schema: public
     change-log: classpath:/db/changelog/main-changelog.json
+
 
 logging:
   level:
@@ -41,3 +46,4 @@ cloudstorage:
       user: ${MINIO_ROOT_USER}
       password: ${MINIO_ROOT_PASSWORD}
       bucket: ${MINIO_BUCKET}
+
