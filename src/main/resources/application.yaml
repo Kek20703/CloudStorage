@@ -24,7 +24,7 @@ server:
   servlet:
     session:
       cookie:
-        max-age: 30m
+        max-age: 300m
         name: SESSION
         http-only: true
         secure: true

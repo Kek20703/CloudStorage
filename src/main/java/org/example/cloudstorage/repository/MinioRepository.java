@@ -119,6 +119,7 @@ public class MinioRepository implements FileStorageRepository {
 
     @Override
     public ResourceInfoResponseDto rename(Long userId, String oldPath, String newPath) {
+        ResourceInfoResponseDto responseDto;
         String oldFullPath = formatPath(userId, oldPath);
         if (!checkIfObjectExists(oldFullPath)) {
             throw new ResourceNotFoundException("Object does not exists");
@@ -127,11 +128,16 @@ public class MinioRepository implements FileStorageRepository {
         if (isDirectory(oldFullPath)) {
             copyDirectory(oldFullPath, newFullPath);
             deleteDirectory(oldFullPath);
+            responseDto = createResourceInfoResponseDto(newPath);
         } else {
+            if(checkIfObjectExists(newFullPath)) {
+                throw new ResourceAlreadyExistsException("Object already exists");
+            }
             copyObject(oldFullPath, newFullPath);
+            responseDto = getInfo(userId, newPath);
         }
         removeObject(oldFullPath);
-        return getInfo(userId, newPath);
+        return responseDto;
     }
 
     @Override
@@ -279,7 +285,7 @@ public class MinioRepository implements FileStorageRepository {
     }
 
     private void createEmptyFolder(String folderName) {
-        if(checkIfObjectExists(folderName)) {
+        if (checkIfObjectExists(folderName)) {
             throw new ResourceAlreadyExistsException("Object already exists");
         }
         try {
@@ -374,6 +380,12 @@ public class MinioRepository implements FileStorageRepository {
         return isDirectory(path)
                 ? new FolderInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY)
                 : new FileInfoResponseDto(responsePath, responseName, responseSize, RESPONSE_TYPE_FILE);
+    }
+
+    private ResourceInfoResponseDto createResourceInfoResponseDto(String path) {
+        String responsePath = extractPath(path);
+        String responseName = extractName(path);
+        return new FolderInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY);
     }
 
     private boolean isDirectory(String path) {
