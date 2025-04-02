@@ -15,7 +15,6 @@ import io.minio.UploadSnowballObjectsArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.example.cloudstorage.config.MinioProperties;
 import org.example.cloudstorage.dto.response.storage.FileInfoResponseDto;
@@ -119,7 +118,6 @@ public class MinioRepository implements FileStorageRepository {
     }
 
     @Override
-    @SneakyThrows
     public ResourceInfoResponseDto rename(Long userId, String oldPath, String newPath) {
         String oldFullPath = formatPath(userId, oldPath);
         if (!checkIfObjectExists(oldFullPath)) {
@@ -281,6 +279,9 @@ public class MinioRepository implements FileStorageRepository {
     }
 
     private void createEmptyFolder(String folderName) {
+        if(checkIfObjectExists(folderName)) {
+            throw new ResourceAlreadyExistsException("Object already exists");
+        }
         try {
             minioClient.putObject(
                     PutObjectArgs.builder()
