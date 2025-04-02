@@ -130,7 +130,7 @@ public class MinioRepository implements FileStorageRepository {
             deleteDirectory(oldFullPath);
             responseDto = createResourceInfoResponseDto(newPath);
         } else {
-            if(checkIfObjectExists(newFullPath)) {
+            if (checkIfObjectExists(newFullPath)) {
                 throw new ResourceAlreadyExistsException("Object already exists");
             }
             copyObject(oldFullPath, newFullPath);
@@ -142,6 +142,7 @@ public class MinioRepository implements FileStorageRepository {
 
     @Override
     public List<ResourceInfoResponseDto> search(Long userId, String path) {
+        String responsePath;
         List<ResourceInfoResponseDto> resultList = new ArrayList<>();
         String userDirectory = formatUserPrefix(userId);
         Iterable<Result<Item>> resources = getListFiles(userDirectory, RECURSIVE);
@@ -149,10 +150,16 @@ public class MinioRepository implements FileStorageRepository {
             try {
                 Item item = resultItem.get();
                 String objectName = extractName(item.objectName());
+                String objectPath = extractPath(item.objectName());
                 if (objectName.toLowerCase().contains(path.toLowerCase())) {
-                    String responsePath = removeUserPrefix(item.objectName());
+                    responsePath = removeUserPrefix(item.objectName());
                     long responseSize = item.size();
                     ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath, responseSize);
+                    resultList.add(responseDto);
+                }
+                if (objectPath.toLowerCase().contains(path.toLowerCase()) && isDirectory(objectPath)) {
+                    responsePath = removeUserPrefix(objectPath);
+                    ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath);
                     resultList.add(responseDto);
                 }
             } catch (Exception e) {
