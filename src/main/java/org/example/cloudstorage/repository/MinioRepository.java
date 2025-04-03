@@ -15,7 +15,6 @@ import io.minio.UploadSnowballObjectsArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.cloudstorage.config.MinioProperties;
 import org.example.cloudstorage.dto.response.storage.FileInfoResponseDto;
 import org.example.cloudstorage.dto.response.storage.FolderInfoResponseDto;
@@ -43,7 +42,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Repository
-@Slf4j
 @RequiredArgsConstructor
 @ConditionalOnBean(MinioClient.class)
 public class MinioRepository implements FileStorageRepository {
