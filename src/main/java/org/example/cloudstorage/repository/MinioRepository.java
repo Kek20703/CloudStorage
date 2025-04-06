@@ -37,7 +37,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -141,30 +143,30 @@ public class MinioRepository implements FileStorageRepository {
     @Override
     public List<ResourceInfoResponseDto> search(Long userId, String path) {
         String responsePath;
-        List<ResourceInfoResponseDto> resultList = new ArrayList<>();
+        Set<ResourceInfoResponseDto> resultSet = new HashSet<>();
         String userDirectory = formatUserPrefix(userId);
         Iterable<Result<Item>> resources = getListFiles(userDirectory, RECURSIVE);
         for (Result<Item> resultItem : resources) {
             try {
                 Item item = resultItem.get();
-                String objectName = extractName(item.objectName());
-                String objectPath = extractPath(item.objectName());
-                if (objectName.toLowerCase().contains(path.toLowerCase())) {
+                String itemName = removeUserPrefix(item.objectName());
+                String objectName = extractName(itemName);
+                String objectPath = extractPath(itemName);
+                if (objectName.toLowerCase().contains(path.toLowerCase()) && !isDirectory(objectName)) {
                     responsePath = removeUserPrefix(item.objectName());
                     long responseSize = item.size();
                     ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath, responseSize);
-                    resultList.add(responseDto);
+                    resultSet.add(responseDto);
                 }
                 if (objectPath.toLowerCase().contains(path.toLowerCase()) && isDirectory(objectPath)) {
-                    responsePath = removeUserPrefix(objectPath);
-                    ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(responsePath);
-                    resultList.add(responseDto);
+                    ResourceInfoResponseDto responseDto = createResourceInfoResponseDto(objectPath);
+                    resultSet.add(responseDto);
                 }
             } catch (Exception e) {
                 throw new StorageException(e.getMessage());
             }
         }
-        return resultList;
+        return new ArrayList<>(resultSet);
     }
 
     @Override
