@@ -35,20 +35,30 @@ public class AuthController {
     @PostMapping("/sign-up")
     @SignUpDocs
     @ResponseStatus(HttpStatus.CREATED)
-    public SignUpResponseDto register(@Validated @RequestBody SignUpRequestDto requestDto) {
-        return userService.signUp(requestDto);
+    public SignUpResponseDto signUp (@Validated @RequestBody SignUpRequestDto requestDto, HttpServletResponse response, HttpServletRequest request) {
+        SignUpResponseDto responseDto = userService.signUp(requestDto);
+        authenticateUser(responseDto.username(),requestDto.password(),request, response);
+        return responseDto;
     }
 
     @PostMapping("/sign-in")
     @SignInDocs
     public SignInResponseDto signIn(@Validated @RequestBody SignInRequestDto requestDto,
                                     HttpServletRequest request, HttpServletResponse response) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requestDto.username(), requestDto.password())
-        );
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(authentication);
-        securityContextRepository.saveContext(context, request, response);
+        authenticateUser(requestDto.username(), requestDto.password(), request, response);
         return new SignInResponseDto(requestDto.username());
     }
+
+    private void authenticateUser(String username, String password,
+                                  HttpServletRequest request, HttpServletResponse response) {
+        UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken(username, password);
+        Authentication authentication = authenticationManager.authenticate(token);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
+    }
+
+
 }
