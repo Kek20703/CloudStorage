@@ -16,8 +16,6 @@ import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import org.example.cloudstorage.config.MinioProperties;
-import org.example.cloudstorage.dto.response.storage.FileInfoResponseDto;
-import org.example.cloudstorage.dto.response.storage.FolderInfoResponseDto;
 import org.example.cloudstorage.dto.response.storage.ResourceInfoResponseDto;
 import org.example.cloudstorage.exception.ResourceAlreadyExistsException;
 import org.example.cloudstorage.exception.ResourceNotFoundException;
@@ -385,14 +383,14 @@ public class MinioRepository implements FileStorageRepository {
         String responsePath = extractPath(path);
         String responseName = extractName(path);
         return isDirectory(path)
-                ? new FolderInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY)
-                : new FileInfoResponseDto(responsePath, responseName, responseSize, RESPONSE_TYPE_FILE);
+                ? new ResourceInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY)
+                : new ResourceInfoResponseDto(responsePath, responseName, responseSize, RESPONSE_TYPE_FILE);
     }
 
     private ResourceInfoResponseDto createResourceInfoResponseDto(String path) {
         String responsePath = extractPath(path);
         String responseName = extractName(path);
-        return new FolderInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY);
+        return new ResourceInfoResponseDto(responsePath, responseName + "/", RESPONSE_TYPE_DIRECTORY);
     }
 
     private boolean isDirectory(String path) {
