@@ -12,7 +12,7 @@ public class CorsConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("http://localhost:32768");
+        corsConfiguration.addAllowedOriginPattern("http://localhost:[*]");
         corsConfiguration.setAllowedMethods(List.of("POST", "GET", "OPTIONS", "DELETE"));
         corsConfiguration.addAllowedHeader("Content-Type");
         corsConfiguration.setAllowCredentials(true);
