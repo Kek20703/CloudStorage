@@ -1,6 +1,8 @@
 package org.example.cloudstorage.advice;
 
 import org.example.cloudstorage.dto.response.ErrorResponseDto;
+import org.example.cloudstorage.exception.ResourceAlreadyExistsException;
+import org.example.cloudstorage.exception.ResourceNotFoundException;
 import org.example.cloudstorage.exception.UsernameIsAlreadyTakenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +38,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDto> handleBadCredentialsException(BadCredentialsException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponseDto("InvalidCredentials"));
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDto> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto("Resource already exists"));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(ResourceNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto("Resource not found"));
     }
 
     @ExceptionHandler(RuntimeException.class)
