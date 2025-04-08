@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -33,6 +34,20 @@ public class AuthIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.jpa.generate-ddl", () -> true);
+    }
+
+    @Container
+    static MinIOContainer minIOContainer = new MinIOContainer("minio/minio")
+            .withUserName("user")
+            .withPassword("password");
+
+    @DynamicPropertySource
+    static void datasourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("cloudstorage.storage.minio.enabled", () -> true);
+        registry.add("cloudstorage.storage.minio.endpoint", minIOContainer::getS3URL);
+        registry.add("cloudstorage.storage.minio.user", () -> "user");
+        registry.add("cloudstorage.storage.minio.password", () -> "password");
+        registry.add("cloudstorage.storage.minio.bucket", () -> "bucket");
     }
 
     @Test
