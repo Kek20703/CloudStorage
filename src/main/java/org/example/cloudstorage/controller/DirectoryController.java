@@ -3,6 +3,8 @@ package org.example.cloudstorage.controller;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.example.cloudstorage.docs.directoryDocs.GetDirectoryDocs;
+import org.example.cloudstorage.docs.directoryDocs.PostDirectoryDocs;
 import org.example.cloudstorage.dto.response.storage.ResourceInfoResponseDto;
 import org.example.cloudstorage.repository.FileStorageRepository;
 import org.example.cloudstorage.security.CustomUserDetails;
@@ -27,12 +29,14 @@ public class DirectoryController {
     private final FileStorageRepository fileStorageRepository;
 
     @GetMapping
+    @GetDirectoryDocs
     public ResponseEntity<List<ResourceInfoResponseDto>> directory(@RequestParam("path") @NotNull @Size(max = 200) String path, @AuthenticationPrincipal CustomUserDetails userDetails) {
         List<ResourceInfoResponseDto> response = fileStorageRepository.getDirectoryContentInfo(userDetails.getUserId(), path);
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping
+    @PostDirectoryDocs
     @ResponseStatus(HttpStatus.CREATED)
     public ResourceInfoResponseDto createEmptyDirectory(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                         @RequestParam("path") @NotNull @Size(max = 200) String path) {

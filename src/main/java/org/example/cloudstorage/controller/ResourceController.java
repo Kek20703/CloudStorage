@@ -3,6 +3,12 @@ package org.example.cloudstorage.controller;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.example.cloudstorage.docs.resourceDocs.DeleteResourceDocs;
+import org.example.cloudstorage.docs.resourceDocs.DownloadResourceDocs;
+import org.example.cloudstorage.docs.resourceDocs.GetResourceDocs;
+import org.example.cloudstorage.docs.resourceDocs.MoveResourceDocs;
+import org.example.cloudstorage.docs.resourceDocs.SearchResourceDocs;
+import org.example.cloudstorage.docs.resourceDocs.UploadResourceDocs;
 import org.example.cloudstorage.dto.response.storage.ResourceInfoResponseDto;
 import org.example.cloudstorage.repository.FileStorageRepository;
 import org.example.cloudstorage.security.CustomUserDetails;
@@ -35,11 +41,13 @@ public class ResourceController {
     private final FileStorageRepository fileStorageRepository;
 
     @GetMapping
+    @GetResourceDocs
     public ResourceInfoResponseDto resource(@RequestParam("path") @NotNull @Size(max = 200) String path, @AuthenticationPrincipal CustomUserDetails userDetails) {
         return fileStorageRepository.getInfo(userDetails.getUserId(), path);
     }
 
     @GetMapping("/download")
+    @DownloadResourceDocs
     public ResponseEntity<Resource> downloadResource(@AuthenticationPrincipal CustomUserDetails userDetailsImpl, @RequestParam @NotNull String path) {
         Long userId = userDetailsImpl.getUserId();
         Resource resource = fileStorageRepository.get(userId, path);
@@ -47,24 +55,27 @@ public class ResourceController {
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString()).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
     }
 
-
     @DeleteMapping
+    @DeleteResourceDocs
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteResource(@RequestParam("path") @NotNull @Size(max = 200) String path, @AuthenticationPrincipal CustomUserDetails userDetails) {
         fileStorageRepository.delete(userDetails.getUserId(), path);
     }
 
     @GetMapping("/move")
+    @MoveResourceDocs
     public ResourceInfoResponseDto move(@RequestParam("from") @NotNull @Size(max = 200) String from, @RequestParam("to") @NotNull @Size(max = 200) String to, @AuthenticationPrincipal CustomUserDetails userDetails) {
         return fileStorageRepository.rename(userDetails.getUserId(), from, to);
     }
 
     @GetMapping("/search")
+    @SearchResourceDocs
     public List<ResourceInfoResponseDto> search(@RequestParam("query") @NotNull @Size(max = 200) String query, @AuthenticationPrincipal CustomUserDetails userDetails) {
         return fileStorageRepository.search(userDetails.getUserId(), query);
     }
 
     @PostMapping
+    @UploadResourceDocs
     @ResponseStatus(HttpStatus.CREATED)
     public List<ResourceInfoResponseDto> upload(@RequestPart("object") List<MultipartFile> files, @AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam("path") @NotNull @Size(max = 200) String path) {
         return fileStorageRepository.save(userDetails.getUserId(), path, files);

@@ -3,6 +3,8 @@ package org.example.cloudstorage.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.example.cloudstorage.docs.authDocs.SignInDocs;
+import org.example.cloudstorage.docs.authDocs.SignUpDocs;
 import org.example.cloudstorage.dto.request.SignInRequestDto;
 import org.example.cloudstorage.dto.request.SignUpRequestDto;
 import org.example.cloudstorage.dto.response.auth.SignInResponseDto;
@@ -31,12 +33,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/sign-up")
+    @SignUpDocs
     @ResponseStatus(HttpStatus.CREATED)
     public SignUpResponseDto register(@Validated @RequestBody SignUpRequestDto requestDto) {
         return userService.signUp(requestDto);
     }
 
     @PostMapping("/sign-in")
+    @SignInDocs
     public SignInResponseDto signIn(@Validated @RequestBody SignInRequestDto requestDto,
                                     HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
