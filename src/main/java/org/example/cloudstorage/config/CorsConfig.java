@@ -13,7 +13,7 @@ public class CorsConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:32768");
-        corsConfiguration.setAllowedMethods(List.of("POST", "GET", "OPTIONS"));
+        corsConfiguration.setAllowedMethods(List.of("POST", "GET", "OPTIONS", "DELETE"));
         corsConfiguration.addAllowedHeader("Content-Type");
         corsConfiguration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

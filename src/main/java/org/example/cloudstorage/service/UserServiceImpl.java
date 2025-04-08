@@ -2,7 +2,7 @@ package org.example.cloudstorage.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.cloudstorage.dto.request.SignUpRequestDto;
-import org.example.cloudstorage.dto.response.SignUpResponseDto;
+import org.example.cloudstorage.dto.response.auth.SignUpResponseDto;
 import org.example.cloudstorage.entity.User;
 import org.example.cloudstorage.exception.UsernameIsAlreadyTakenException;
 import org.example.cloudstorage.repository.UserRepository;
